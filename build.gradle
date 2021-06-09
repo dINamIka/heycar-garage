@@ -30,9 +30,11 @@ dependencies {
 	implementation 'io.springfox:springfox-swagger2:3.0.0'
 	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
 	implementation 'org.openapitools:jackson-databind-nullable:0.2.1'
+	implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+	implementation 'com.opencsv:opencsv:5.2'
 
-//	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'org.postgresql:postgresql'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor "io.swagger:swagger-annotations:$swagger_annotations_version"
 
@@ -49,4 +51,33 @@ sourceSets {
 
 test {
 	useJUnitPlatform()
+}
+
+openApiGenerate {
+    generatorName = "spring"
+    inputSpec = "$rootDir/src/main/resources/api/garage-api.yml"
+    outputDir = "$buildDir/generated"
+    apiPackage = "car.hey.api"
+    invokerPackage = "car.hey.api.invoker"
+    modelPackage = "car.hey.api.model"
+    library = "spring-boot"
+	enablePostProcessFile = true
+	skipOverwrite = false
+    configOptions = [
+        dateLibrary: "java8",
+		serializationLibrary: "jackson",
+		library             : "spring-boot",
+		useBeanValidation   : "true",
+		interfaceOnly       : "true",
+		serializableModel   : "true",
+		useTags             : "true"
+    ]
+}
+
+compileJava.dependsOn tasks.openApiGenerate
+
+compileJava {
+    options.compilerArgs = [
+            '-Amapstruct.defaultComponentModel=spring'
+    ]
 }

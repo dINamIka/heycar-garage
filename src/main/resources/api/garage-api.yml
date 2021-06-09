@@ -1,0 +1,182 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Heycar Beta
+servers:
+  - url: http://garage.heycar.com/v1
+paths:
+  /upload_csv/{dealer_id}:
+    post:
+      summary: Upload CSV with vehicles for specified dealer.
+      operationId: uploadVehicles
+      tags:
+        - vehicles
+        - csv
+      parameters:
+        - name: dealer_id
+          in: path
+          required: true
+          description: The id of the Dealer who is uploading vehicles
+          schema:
+            type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                csvFile:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: 'Listing updated'
+        '400':
+          description: 'Bad request'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '404':
+          description: 'Dealer not found'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '500':
+          description: 'Internal Error'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /vehicle_listings/{dealer_id}:
+    post:
+      summary: Save vehicles listing.
+      operationId: saveVehicles
+      tags:
+        - vehicles
+      parameters:
+        - name: dealer_id
+          in: path
+          required: true
+          description: The id of the Dealer who is saving vehicles
+          schema:
+            type: integer
+      requestBody:
+        description: List of vehicles to save.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vehicles'
+      responses:
+        '200':
+          description: 'Listing updated'
+        '400':
+          description: 'Bad request'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '404':
+          description: 'Dealer not found'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        '500':
+          description: 'Internal Error'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /search:
+    get:
+      summary: List all vehicles
+      operationId: listVehicles
+      tags:
+        - vehicles
+      parameters:
+        - name: make
+          in: query
+          description: Car maker
+          required: false
+          schema:
+            type: string
+        - name: model
+          in: query
+          description: Car model
+          required: false
+          schema:
+            type: string
+        - name: year
+          in: query
+          description: Year of manufacture
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: color
+          in: query
+          description: Year of manufacture
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Listing of vehicles for specified criteria
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vehicles"
+        '500':
+          description: 'Internal Error'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Vehicle:
+      type: object
+      required:
+        - code
+        - make
+        - model
+        - kW
+        - year
+        - price
+      properties:
+        code:
+          type: string
+        make:
+          type: string
+        model:
+          type: string
+        kW:
+          type: integer
+          format: int32
+        year:
+          type: integer
+          format: int32
+        color:
+          type: string
+        price:
+          type: integer
+          format: int32
+    Vehicles:
+      type: array
+      items:
+        $ref: "#/components/schemas/Vehicle"
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string

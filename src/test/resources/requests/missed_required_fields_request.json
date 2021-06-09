@@ -1,0 +1,18 @@
+[
+  {
+    "make": "mercedes",
+    "model": "a 180",
+    "kW": 123,
+    "year": 2014,
+    "color": "black",
+    "price": 15950
+  },
+  {
+    "code": "2",
+    "make": "audi",
+    "model": "a3",
+    "kW": 111,
+    "year": 2016,
+    "price": 17210
+  }
+]

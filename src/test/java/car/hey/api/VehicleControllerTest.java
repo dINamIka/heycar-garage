@@ -3,23 +3,25 @@ package car.hey.api;
 import car.hey.api.model.CsvVehicleRecord;
 import car.hey.api.model.Error;
 import car.hey.domain.Vehicle;
-import car.hey.domain.VehicleSearchCriteria;
 import car.hey.exception.DealerNotFoundException;
 import car.hey.service.CsvParser;
 import car.hey.service.VehicleService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static car.hey.service.CsvParserTest.validCsvRecords;
 import static java.util.Objects.requireNonNull;
@@ -28,7 +30,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -49,6 +50,8 @@ class VehicleControllerTest {
     private VehicleService serviceMock;
     @MockBean
     private CsvParser parserMock;
+    @Captor
+    private ArgumentCaptor<Stream<Vehicle>> vehicleStreamCaptor;
 
     @Autowired
     private MockMvc mockMvc;
@@ -71,7 +74,9 @@ class VehicleControllerTest {
                     .andReturn();
 
             // then
-            verify(serviceMock).saveVehicles(validVehicleListing());
+            verify(serviceMock).saveVehicles(vehicleStreamCaptor.capture(), eq(1));
+            assertThat(vehicleStreamCaptor.getValue())
+                    .containsExactlyElementsOf(validVehicleListing().collect(Collectors.toList()));
         }
     }
 
@@ -81,7 +86,7 @@ class VehicleControllerTest {
         try (var requestIS = this.getClass()
                 .getResourceAsStream("/requests/valid_request.json")) {
 
-            doThrow(DealerNotFoundException.class).when(serviceMock).saveVehicles(any());
+            doThrow(DealerNotFoundException.class).when(serviceMock).saveVehicles(any(), eq(1));
 
             // when
             var mvcResult = mockMvc.perform(
@@ -94,7 +99,9 @@ class VehicleControllerTest {
                     .andReturn();
 
             // then
-            verify(serviceMock).saveVehicles(validVehicleListing());
+            verify(serviceMock).saveVehicles(vehicleStreamCaptor.capture(), eq(1));
+            assertThat(vehicleStreamCaptor.getValue())
+                    .containsExactlyElementsOf(validVehicleListing().collect(Collectors.toList()));
             var errMsg = objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), Error.class);
             assertThat(errMsg.getCode()).isEqualTo(4040);
         }
@@ -116,7 +123,9 @@ class VehicleControllerTest {
                     .andReturn();
 
             // then
-            verify(serviceMock).saveVehicles(eq(validVehicleListing()));
+            verify(serviceMock).saveVehicles(vehicleStreamCaptor.capture(), eq(1));
+            assertThat(vehicleStreamCaptor.getValue())
+                    .containsExactlyElementsOf(validVehicleListing().collect(Collectors.toList()));
         }
     }
 
@@ -125,7 +134,7 @@ class VehicleControllerTest {
         // given
         try (var csvIS = this.getClass() .getResourceAsStream("/csv/valid_listing.csv");) {
             when(parserMock.parseCsvAsRecord(notNull(), eq(CsvVehicleRecord.class))).thenReturn(validCsvRecords());
-            doThrow(DealerNotFoundException.class).when(serviceMock).saveVehicles(any());
+            doThrow(DealerNotFoundException.class).when(serviceMock).saveVehicles(any(), eq(1));
 
             // when
             var mvcResult = mockMvc.perform(
@@ -137,7 +146,9 @@ class VehicleControllerTest {
                     .andReturn();
 
             // then
-            verify(serviceMock).saveVehicles(validVehicleListing());
+            verify(serviceMock).saveVehicles(vehicleStreamCaptor.capture(), eq(1));
+            assertThat(vehicleStreamCaptor.getValue())
+                    .containsExactlyElementsOf(validVehicleListing().collect(Collectors.toList()));
             var errMsg = objectMapper.readValue(mvcResult.getResponse().getContentAsByteArray(), Error.class);
             assertThat(errMsg.getCode()).isEqualTo(4040);
         }
@@ -148,7 +159,8 @@ class VehicleControllerTest {
         try (var requestIS = this.getClass()
                 .getResourceAsStream("/requests/valid_request.json")) {
 
-            when(serviceMock.findByCriteria(any(VehicleSearchCriteria.class))).thenReturn(validVehicleListing());
+            when(serviceMock.searchWithParameters(any()))
+                    .thenReturn(validVehicleListing().collect(Collectors.toList()));
 
             // when
             var mvcResult = mockMvc.perform(
@@ -186,11 +198,11 @@ class VehicleControllerTest {
         );
     }
 
-    private static List<Vehicle> validVehicleListing() {
-        return List.of(
+    private static Stream<Vehicle> validVehicleListing() {
+        return Stream.of(
                 Vehicle.builder()
                         .code("1")
-                        .manufacturer("mercedes")
+                        .make("mercedes")
                         .model("a 180")
                         .powerInKW(123)
                         .year(2014)
@@ -199,7 +211,7 @@ class VehicleControllerTest {
                         .build(),
                 Vehicle.builder()
                         .code("2")
-                        .manufacturer("audi")
+                        .make("audi")
                         .model("a3")
                         .powerInKW(111)
                         .year(2016)

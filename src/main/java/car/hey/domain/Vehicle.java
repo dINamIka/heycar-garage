@@ -1,21 +1,35 @@
 package car.hey.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Vehicle {
-    private int dealerId;
+
+    @NotNull
+    private Integer dealerId;
+    @NotBlank
     private String code;
-    private String manufacturer;
+    @NotBlank
+    private String make;
+    @NotBlank
     private String model;
+    @Positive
     private int powerInKW;
+    @Positive
     private int year;
     private String color;
-    private Long price;
-    private Instant creationTime;
-    private Instant lastUpdate;
+    @PositiveOrZero
+    private long price;
+
 }

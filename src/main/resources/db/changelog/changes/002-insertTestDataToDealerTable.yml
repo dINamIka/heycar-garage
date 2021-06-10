@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002_insertTestDataIntoDealers
+      author: E_Yarmak
+      changes:
+        - insert:
+            tableName: dealer
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: name
+                  value: "Fancy Cars"
+        - insert:
+            tableName: dealer
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 2
+              - column:
+                  name: name
+                  value: "Global Auto"

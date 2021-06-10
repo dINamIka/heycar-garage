@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,8 +31,8 @@ public class VehicleController implements VehiclesApi {
                                                       @Valid String model,
                                                       @Valid Integer year,
                                                       @Valid String color) {
-        var searchCriteria = mapper.queryToSearchCriteria(make, model, year, color);
-        var vehicles = service.findByCriteria(searchCriteria);
+        var searchParameters = mapper.queryToSearchParameters(make, model, year, color);
+        var vehicles = service.searchWithParameters(searchParameters);
         return ResponseEntity.ok(
                 vehicles.stream()
                         .map(mapper::domainToRest)
@@ -42,23 +43,20 @@ public class VehicleController implements VehiclesApi {
     @Override
     public ResponseEntity<Void> saveVehicles(Integer dealerId, @Valid List<Vehicle> vehicles) {
         var vehiclesToSave = vehicles.stream()
-                .map(mapper::restToDomain)
-                .collect(Collectors.toList());
-        service.saveVehicles(vehiclesToSave);
+                .map(mapper::restToDomain);
+        service.saveVehicles(vehiclesToSave, dealerId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @SneakyThrows
+    @SneakyThrows(IOException.class)
     @Override
     public ResponseEntity<Void> uploadVehicles(Integer dealerId,
                                                @Valid MultipartFile upload) {
         try (var inputStream = upload.getInputStream()) {
             var vehicleRecords = csvParser.parseCsvAsRecord(inputStream, CsvVehicleRecord.class);
             var vehiclesToSave = vehicleRecords.stream()
-                    .map(mapper::csvRecordToDomain)
-                    .collect(Collectors.toList());
-            LOG.info("CSV: {}", vehiclesToSave);
-            service.saveVehicles(vehiclesToSave);
+                    .map(mapper::csvRecordToDomain);
+            service.saveVehicles(vehiclesToSave, dealerId);
             return new ResponseEntity<>(HttpStatus.OK);
         }
     }

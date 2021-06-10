@@ -1,0 +1,117 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001_dropDealerTableIfExists
+      author: E_Yarmak
+      preConditions:
+        - onFail: MARK_RAN
+          tableExists:
+            tableName: dealer
+      changes:
+        - dropTable:
+            cascadeConstraints: true
+            tableName: dealer
+
+  - changeSet:
+      id: 001_createDealerTable
+      author: E_Yarmak
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: dealer
+      changes:
+        - createTable:
+            tableName: dealer
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: dealer_pkey
+                  name: id
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(30)
+
+  - changeSet:
+      id: 001_dropVehicleTableIfExists
+      author: E_Yarmak
+      preConditions:
+        - onFail: MARK_RAN
+          tableExists:
+            tableName: vehicle
+      changes:
+        - dropTable:
+            cascadeConstraints: true
+            tableName: vehicle
+
+  - changeSet:
+      id: 001_createVehicleTable
+      author: E_Yarmak
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            tableExists:
+              tableName: vehicle
+      changes:
+        - createTable:
+            tableName: vehicle
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: vehicle_pkey
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_vehicle_dealer
+                    references: dealer(id)
+                  name: dealer_id
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  name: code
+                  type: VARCHAR(20)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: make
+                  type: VARCHAR(40)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: model
+                  type: VARCHAR(40)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: power_in_kw
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                  name: year
+                  type: INTEGER
+              - column:
+                  constraints:
+                    nullable: true
+                  name: color
+                  type: VARCHAR(24)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: price
+                  type: BIGINT
+        - addUniqueConstraint:
+            constraintName: uq_vehicle_ids
+            tableName: vehicle
+            columnNames: dealer_id, code

@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Data
 @Setter(AccessLevel.NONE)
@@ -31,7 +30,7 @@ public class CsvVehicleRecord {
     @CsvBindByName(column = "price", required = true)
     private Long price;
 
-    public String getManufacturer() {
+    public String getMake() {
         return makeAndModel.substring(0, makeAndModel.indexOf("/"));
     }
 

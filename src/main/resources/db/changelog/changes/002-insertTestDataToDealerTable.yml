@@ -1,4 +1,5 @@
 databaseChangeLog:
+# for demo purpose only
   - changeSet:
       id: 002_insertTestDataIntoDealers
       author: E_Yarmak

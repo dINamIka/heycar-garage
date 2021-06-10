@@ -3,6 +3,7 @@ package car.hey.service;
 import car.hey.domain.Vehicle;
 import car.hey.domain.VehicleSearchParameters;
 import car.hey.exception.DealerNotFoundException;
+import car.hey.persistence.DealerEntity;
 import car.hey.persistence.DealerRepository;
 import car.hey.persistence.VehicleEntity;
 import car.hey.persistence.VehiclePersistenceMapper;
@@ -50,7 +51,7 @@ public class VehicleService {
         return spec;
     }
 
-    public void saveVehicles(final Stream<Vehicle> vehicles, int dealerId) {
+    public void saveVehicles(final Stream<Vehicle> vehicles, final int dealerId) {
         var dealer = dealerRepository.findById(dealerId)
                 .orElseThrow(
                         () -> new DealerNotFoundException(String.format("Dealer with id: %d doesn't exist!", dealerId))
@@ -64,13 +65,13 @@ public class VehicleService {
         );
     }
 
-    private VehicleEntity updateVehicle(Vehicle vehicle, VehicleEntity entity) {
+    private VehicleEntity updateVehicle(final Vehicle vehicle, final VehicleEntity entity) {
         LOG.info("Updating existing vehicle: {}", vehicle);
         vehicleMapper.updateVehicle(vehicle, entity);
         return entity;
     }
 
-    private VehicleEntity createNewVehicle(car.hey.persistence.DealerEntity dealer, Vehicle v) {
+    private VehicleEntity createNewVehicle(final DealerEntity dealer, final Vehicle v) {
         LOG.info("Creating a new vehicle: {}", v);
         var newVehicle = vehicleMapper.mapToEntity(v);
         newVehicle.setDealer(dealer);

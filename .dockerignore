@@ -1,0 +1,10 @@
+.git
+.gitignore
+*.md
+.idea
+.build
+build
+out
+.gradle
+Dockerfile
+*.bat

@@ -3,7 +3,6 @@ package car.hey.service;
 import car.hey.domain.Vehicle;
 import car.hey.domain.VehicleSearchParameters;
 import car.hey.persistence.DealerEntity;
-import car.hey.persistence.DealerRepository;
 import car.hey.persistence.VehicleEntity;
 import car.hey.persistence.VehiclePersistenceMapper;
 import car.hey.persistence.VehiclePersistenceMapperImpl;
@@ -30,8 +29,6 @@ class VehicleServiceTest {
     private VehiclePersistenceMapper vehicleMapper = new VehiclePersistenceMapperImpl();
     @Mock
     private VehicleRepository vehicleRepository;
-    @Mock
-    private DealerRepository dealerRepository;
 
     @Captor
     private ArgumentCaptor<Specification<VehicleEntity>> searchSpecCaptor;

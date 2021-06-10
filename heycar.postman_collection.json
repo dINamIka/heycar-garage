@@ -1,0 +1,128 @@
+{
+	"info": {
+		"_postman_id": "d8727dbd-2181-42d2-a65b-f134e56ca4cf",
+		"name": "heycar",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:8080/search?color=white&make=audi",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "csvFile",
+							"type": "file",
+							"src": "/Users/eugeneyarmack/Downloads/test.csv"
+						},
+						{
+							"key": "vehiclesCSV",
+							"value": "test.txt",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/search?color=white&make=audi",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"search"
+					],
+					"query": [
+						{
+							"key": "color",
+							"value": "white"
+						},
+						{
+							"key": "make",
+							"value": "audi"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/upload_csv/1",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "csvFile",
+							"type": "file",
+							"src": "/Users/eugeneyarmack/Downloads/test.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/upload_csv/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"upload_csv",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/vehicle_listings/2",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n  {\n    \"code\": \"1\",\n    \"make\": \"mercedes\",\n    \"model\": \"a 180\",\n    \"kW\": 123,\n    \"year\": 2014,\n    \"color\": \"black\",\n    \"price\": 15950\n  },\n  {\n    \"code\": \"3\",\n    \"make\": \"audi\",\n    \"model\": \"a3\",\n    \"kW\": 111,\n    \"year\": 2016,\n    \"price\": 17210\n  }\n]\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/vehicle_listings/2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"vehicle_listings",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
